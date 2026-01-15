@@ -2,26 +2,34 @@ name: Actualizar TRMI
 
 on:
   schedule:
-    - cron: "0 * * * *"   # cada hora
-  workflow_dispatch:
+    - cron: "0 * * * *"   # Ejecuta cada hora en el minuto 0 (UTC)
+  workflow_dispatch:       # Permite ejecutarlo manualmente desde la UI
 
 jobs:
-  build:
+  update-trmi:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Consultar TRMI
+      - name: Consultar TRMI desde elTOQUE
         run: |
-          curl -H "Authorization: Bearer ${{ secrets.ELTOQUE_KEY }}" \
+          set -e
+          curl -s -H "Authorization: Bearer ${{ secrets.ELTOQUE_KEY }}" \
             https://api.eltoque.com/v1/trmi \
             -o data.json
 
-      - name: Commit y push
+          # Añadimos metadatos útiles
+          jq '. + {updated_at: (now | todate)}' data.json > data.tmp && mv data.tmp data.json
+
+      - name: Commit y push de data.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions"
+          set -e
+          git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add data.json
-          git commit -m "Actualizar TRMI"
+          git commit -m "Actualizar TRMI: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "Sin cambios"
           git push
