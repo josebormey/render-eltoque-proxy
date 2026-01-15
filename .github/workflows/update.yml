@@ -18,7 +18,7 @@ jobs:
           set -e
           echo "Consultando API elTOQUE..."
           curl -s -H "Authorization: Bearer ${{ secrets.ELTOQUE_KEY }}" \
-            https://tasas.eltoque.com/api/trmi \
+            https://tasas.eltoque.com/api/v1/trmi/latest \
             -o data.json
           echo "Contenido descargado:"
           cat data.json
