@@ -1,0 +1,27 @@
+name: Actualizar TRMI
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # cada hora
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Consultar TRMI
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.ELTOQUE_KEY }}" \
+            https://api.eltoque.com/v1/trmi \
+            -o data.json
+
+      - name: Commit y push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data.json
+          git commit -m "Actualizar TRMI"
+          git push
