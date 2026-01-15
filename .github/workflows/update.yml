@@ -16,12 +16,12 @@ jobs:
       - name: Consultar TRMI desde elTOQUE
         run: |
           set -e
+          echo "Consultando API elTOQUE..."
           curl -s -H "Authorization: Bearer ${{ secrets.ELTOQUE_KEY }}" \
             https://api.eltoque.com/v1/trmi \
             -o data.json
-
-          # Añadimos metadatos útiles
-          jq '. + {updated_at: (now | todate)}' data.json > data.tmp && mv data.tmp data.json
+          echo "Contenido descargado:"
+          cat data.json
 
       - name: Commit y push de data.json
         env:
@@ -31,5 +31,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add data.json
-          git commit -m "Actualizar TRMI: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "Sin cambios"
+          git commit -m "Actualizar TRMI" || echo "Sin cambios"
           git push
