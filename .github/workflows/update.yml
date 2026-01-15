@@ -24,12 +24,10 @@ jobs:
           cat data.json
 
       - name: Commit y push de data.json
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add data.json
           git commit -m "Actualizar TRMI" || echo "Sin cambios"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
